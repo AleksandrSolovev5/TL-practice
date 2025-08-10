@@ -1,5 +1,6 @@
 ﻿using Fighters.Models.Fighters;
 using Fighters.Extensions;
+using Fighters.Utils;
 
 namespace Fighters
 {
@@ -9,6 +10,7 @@ namespace Fighters
         private IFighter? Fighter2 { get; set; }
         private Random random = new Random();
         private const int MaxRounds = 100;
+        private const int ChoicesForStart = 2;
 
         public void SetFighters( IFighter fighter1, IFighter fighter2 )
         {
@@ -16,26 +18,26 @@ namespace Fighters
             Fighter2 = fighter2;
         }
 
-        public void StartFight()
+        public bool StartFight()
         {
             if ( Fighter1 == null || Fighter2 == null )
             {
-                Console.WriteLine( "Two fighters are required to start a fight." );
-                return;
+                ConsolePrinter.PrintMessage( "Two fighters are required to start a fight." );
+                return false;
             }
 
             WriteInfo();
             int round = 1;
 
             // случайный выбор, кто первый начнёт
-            bool firstStarts = random.Next( 2 ) == 0;
+            bool firstStarts = random.Next( ChoicesForStart ) == 0;
             IFighter firstFighter = firstStarts ? Fighter1 : Fighter2;
             IFighter secondFighter = firstStarts ? Fighter2 : Fighter1;
-            Console.WriteLine( $"{firstFighter.Name} starts the fight!!" );
+            ConsolePrinter.PrintFighterStart( firstFighter.Name );
 
             while ( firstFighter.IsAlive() && secondFighter.IsAlive() && round <= MaxRounds )
             {
-                Console.WriteLine( $"\n=== Round {round} ===" );
+                ConsolePrinter.PrintRound( round );
 
                 PerformAttack( firstFighter, secondFighter );
                 if ( !secondFighter.IsAlive() ) break;
@@ -47,31 +49,31 @@ namespace Fighters
 
             if ( round > MaxRounds )
             {
-                Console.WriteLine( "Draw! Round limit exceeded." );
-                Environment.Exit( 0 );
+                ConsolePrinter.PrintDraw();
+                return true;
             }
 
             if ( Fighter1.IsAlive() )
             {
-                Console.WriteLine( $"\n{Fighter1.Name} wins the fight!" );
+                ConsolePrinter.PrintWinner( Fighter1.Name );
             }
             else
             {
-                Console.WriteLine( $"\n{Fighter2.Name} wins the fight!" );
+                ConsolePrinter.PrintWinner( Fighter2.Name );
             }
-            Environment.Exit( 0 );
+            return true;
         }
 
         private void PerformAttack( IFighter attacker, IFighter target )
         {
             double finalDamage = attacker.Attack( target );
-            Console.WriteLine( $"{attacker.Name} attacks {target.Name} with {finalDamage} damage, {target.Name}'s health: {target.GetCurrentHealth()}" );
+            ConsolePrinter.PrintAttack( attacker.Name, target.Name, finalDamage, target.CurrentHealth );
         }
         private void WriteInfo()
         {
-            Console.WriteLine( "\n=== Fighter Information ===" );
-            Console.WriteLine( $"{Fighter1.Name} - Base damage: {Fighter1.CalculateDamage()}, Health: {Fighter1.GetMaxHealth()}, Armor: {Fighter1.CalculateArmor()}" );
-            Console.WriteLine( $"{Fighter2.Name} - Base damage: {Fighter2.CalculateDamage()}, Health: {Fighter2.GetMaxHealth()}, Armor: {Fighter2.CalculateArmor()}" );
+            ConsolePrinter.PrintFighterInfoHeader();
+            ConsolePrinter.PrintFighterInfo( Fighter1! );
+            ConsolePrinter.PrintFighterInfo( Fighter2! );
             Console.WriteLine();
         }
     }

@@ -5,6 +5,7 @@ using Fighters.Models.Weapons;
 using Fighters.Models.Armors;
 using Fighters.Models;
 using Fighters.Factory;
+using Fighters.Utils;
 
 namespace Fighters
 {
@@ -27,11 +28,11 @@ namespace Fighters
         {
             while ( true )
             {
-                Console.WriteLine( "Enter the fighter's name:" );
+                ConsolePrinter.PrintMessage( "Enter the fighter's name:" );
                 string? name = Console.ReadLine();
                 if ( string.IsNullOrWhiteSpace( name ) )
                 {
-                    Console.WriteLine( "Invalid name. Please try again." );
+                    ConsolePrinter.PrintMessage( "Invalid name. Please try again." );
                     continue;
                 }
                 return name;
@@ -39,25 +40,27 @@ namespace Fighters
         }
         private static T SelectSingleFromList<T>( string category, IReadOnlyList<T> options ) where T : IModel
         {
-            Console.WriteLine( $"""
-                       Select a {category}:
-                       {string.Join( "\n", options.Select( ( model, index ) => $"{index + 1}. {model.Name}" ) )}
-                       """ );
+            ConsolePrinter.PrintOptionsList( category, options );
 
             while ( true )
             {
                 string? input = Console.ReadLine();
 
-                if ( int.TryParse( input, out int choice ) )
+                if ( !int.TryParse( input, out int choice ) )
                 {
-                    if ( choice >= 1 && choice <= options.Count )
-                    {
-                        return options[ choice - 1 ];
-                    }
+                    ConsolePrinter.PrintMessage( "Invalid input. Please enter a number." );
+                    continue;
                 }
 
-                Console.WriteLine( $"Invalid input. Please try again." );
+                if ( choice < 1 || choice > options.Count )
+                {
+                    ConsolePrinter.PrintMessage( "Number out of range. Please try again." );
+                    continue;
+                }
+
+                return options[ choice - 1 ];
             }
+
         }
     }
 }

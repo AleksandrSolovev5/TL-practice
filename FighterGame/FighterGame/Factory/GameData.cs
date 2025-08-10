@@ -7,27 +7,27 @@ namespace Fighters.Factory
 {
     public static class GameData
     {
-        public static List<IRace> AvailableRaces =
+        public static IReadOnlyList<IRace> AvailableRaces =
         [
             new Human(),
             new Goblin(),
             new Giant()
         ];
 
-        public static List<IClass> AvailableClasses =
+        public static IReadOnlyList<IClass> AvailableClasses =
         [
             new Gladiator(),
             new Knight()
         ];
 
-        public static List<IWeapon> AvailableWeapons =
+        public static IReadOnlyList<IWeapon> AvailableWeapons =
         [
             new Spear(),
             new Dagger(),
             new IronSword()
         ];
 
-        public static List<IArmor> AvailableArmors =
+        public static IReadOnlyList<IArmor> AvailableArmors =
         [
             new NoArmor(),
             new LeatherArmor(),

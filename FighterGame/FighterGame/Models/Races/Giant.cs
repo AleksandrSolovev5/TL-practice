@@ -1,6 +1,6 @@
 ﻿namespace Fighters.Models.Races
 {
-    public class Giant : IRace // гигант
+    public class Giant : IRace
     {
         public string Name => "Giant";
         public int Damage => 2;

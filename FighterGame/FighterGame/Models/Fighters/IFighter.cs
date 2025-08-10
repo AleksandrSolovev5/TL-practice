@@ -5,9 +5,8 @@ namespace Fighters.Models.Fighters
 {
     public interface IFighter : IModel
     {
-        public string Name { get; }
-        public double GetCurrentHealth();
-        public int GetMaxHealth();
+        double CurrentHealth { get; }
+        int MaxHealth { get; }
         public int CalculateDamage();
         public int CalculateArmor();
 

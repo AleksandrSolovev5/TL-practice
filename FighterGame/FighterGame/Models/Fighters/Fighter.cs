@@ -1,7 +1,7 @@
 ﻿using Fighters.Models.Armors;
+using Fighters.Models.Classes;
 using Fighters.Models.Races;
 using Fighters.Models.Weapons;
-using Fighters.Models.Classes;
 
 namespace Fighters.Models.Fighters
 {
@@ -23,12 +23,12 @@ namespace Fighters.Models.Fighters
             Name = name;
             _race = race;
             _class = fighterClass;
-            _currentHealth = GetMaxHealth();
+            _currentHealth = MaxHealth;
         }
 
-        public double GetCurrentHealth() => _currentHealth;
+        public double CurrentHealth { get => _currentHealth; }
 
-        public int GetMaxHealth() => _race.Health + _class.Health;
+        public int MaxHealth { get => _race.Health + _class.Health; }
 
         public int CalculateDamage() => _weapon.Damage + _race.Damage + _class.Damage;
 
@@ -55,21 +55,25 @@ namespace Fighters.Models.Fighters
             _currentHealth = Math.Round( newHealth, 1 );
         }
 
-        public double Attack( IFighter target )
+        private double CalculateFinalDamage()
         {
             int baseDamage = CalculateDamage();
-            double variation = 0.9 + rand.NextDouble() * 0.2;
-            double finalDamage = baseDamage * variation;
+            double randomMultiplier = 0.9 + rand.NextDouble() * 0.2; // урон +- 10% от базового
+            double damage = baseDamage * randomMultiplier;
             if ( rand.NextDouble() < criticalHitChance )
             {
-                finalDamage *= multiplicatorCriticalDamage;
+                damage *= multiplicatorCriticalDamage;
             }
+            return damage;
+        }
+
+        public double Attack( IFighter target )
+        {
+            double finalDamage = CalculateFinalDamage();
             finalDamage = Math.Max( finalDamage - target.CalculateArmor(), 0 );
             finalDamage = Math.Round( finalDamage, 1 );
             target.TakeDamage( finalDamage );
-
             return finalDamage;
-
         }
     }
 }
