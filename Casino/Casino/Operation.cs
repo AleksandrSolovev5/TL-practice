@@ -1,5 +1,5 @@
 ﻿namespace Casino;
-internal enum Operation
+public enum Operation
 {
     Initial = 0,
     Play = 1,
