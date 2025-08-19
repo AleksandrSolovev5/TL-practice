@@ -20,8 +20,8 @@ namespace Fighters
             IArmor armor = SelectSingleFromList( "armor", GameData.AvailableArmors );
 
             IFighter fighter = new Fighter( name, race, fighterClass );
-            fighter.SetWeapon( weapon );
-            fighter.SetArmor( armor );
+            fighter.Weapon = weapon;
+            fighter.Armor = armor;
             return fighter;
         }
         private static string GetName()

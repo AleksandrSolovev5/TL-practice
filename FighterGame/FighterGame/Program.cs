@@ -9,6 +9,7 @@ public static class Program
     private static List<IFighter> Fighters { get; } = [];
     private static GameManager gameManager = new();
     public static bool isFinished = false;
+
     public static void Main()
     {
         ConsolePrinter.PrintMenu();
@@ -25,8 +26,7 @@ public static class Program
                         AddFighter();
                         break;
                     case MenuCommand.StartFight:
-                        Fight();
-                        if ( isFinished )
+                        if ( HandleStartFight() )
                             return;
                         break;
                     case MenuCommand.Exit:
@@ -71,5 +71,12 @@ public static class Program
             ConsolePrinter.PrintNotEnoughFighters();
         }
     }
+
+    private static bool HandleStartFight()
+    {
+        Fight();
+        return isFinished;
+    }
+
 }
 
