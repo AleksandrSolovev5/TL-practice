@@ -1,28 +1,28 @@
+using OrderManager.Enums;
+
 namespace OrderManager.Services
 {
-    public class OrderService
+    public static class OrderService
     {
-        public DateTime CalculateDeliveryDate( int days )
+        public static DateTime CalculateDeliveryDate( int days )
         {
             return DateTime.Today.AddDays( days );
         }
 
-        public Order CreateOrder( string productName, int quantity, string customerName, string address, DateTime deliveryDate )
+        public static Order CreateOrder( string productName, int quantity, string customerName, string address, DateTime deliveryDate )
         {
             return new Order( productName, quantity, customerName, address, deliveryDate );
         }
 
-        public bool ProcessConfirmation( Enums.Confirmation answer, Order order, ConsoleService console )
+        public static bool ProcessConfirmation( Confirmation answer, Order order )
         {
-            if ( answer == Enums.Confirmation.Yes )
+            if ( answer == Confirmation.Yes )
             {
-                console.WriteLine( "" );
-                console.WriteLine( $"{order.CustomerName}! Your order of {order.Quantity} {order.ProductName} has been placed! Expect delivery to {order.Address} {order.DeliveryDate:dd.MM.yyyy}." );
+                ConsoleService.WriteOrderPlaced( order.CustomerName, order.Quantity, order.ProductName, order.Address, order.DeliveryDate );
                 return true;
             }
             else
             {
-                console.WriteLine( "Order cancelled. Returning to main menu. \n" );
                 return false;
             }
         }
