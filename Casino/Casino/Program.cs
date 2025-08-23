@@ -7,101 +7,86 @@ namespace Casino
         public static void Main()
         {
             ConsolePrinter.PrintGameName();
-
-            ConsolePrinter.PrintRequestBalance();
-            string balanceInput = Console.ReadLine();
-            if ( !int.TryParse( balanceInput, out int balance ) || balance <= 0 )
-            {
-                ConsolePrinter.PrintInvalidBalance();
-                return;
-            }
-
+            int balance = ReadInitialBalance();
             CasinoGame game = new CasinoGame( balance );
-
-            Operation? operation = null;
+            Operation operation = Operation.Unknown;
 
             while ( operation != Operation.Exit )
             {
                 ConsolePrinter.PrintMenu();
-                operation = ReadOperation();
-                if ( operation == null )
+                try
+                {
+                    operation = ReadOperation();
+
+                    switch ( operation )
+                    {
+                        case Operation.Unknown:
+                            throw new ArgumentOutOfRangeException();
+
+                        case Operation.Play:
+                            operation = HandlePlayOperation( game );
+                            break;
+
+                        case Operation.CheckBalance:
+                            ConsolePrinter.PrintCurrentBalance( game.Balance );
+                            break;
+
+                        case Operation.Exit:
+                            ConsolePrinter.PrintThankYou();
+                            break;
+                    }
+                }
+                catch ( ArgumentOutOfRangeException )
                 {
                     ConsolePrinter.PrintInvalidSelection();
-                    continue;
-                }
-
-                switch ( operation.Value )
-                {
-                    case Operation.Play:
-                        HandlePlay( game );
-                        if ( game.Balance == 0 )
-                        {
-                            ConsolePrinter.PrintGameOver();
-                            return;
-                        }
-                        break;
-
-                    case Operation.CheckBalance:
-                        ConsolePrinter.PrintCurrentBalance( game.Balance );
-                        break;
-
-                    case Operation.Exit:
-                        ConsolePrinter.PrintThankYou();
-                        break;
                 }
             }
         }
 
-        private static void HandlePlay( CasinoGame game )
+        private static Operation ReadOperation()
         {
-            ConsolePrinter.PrintRequestBet();
-            int bet = GetBet( game );
-
-            bool win = game.PlayRound( bet, out int roll, out int winAmount );
-            ConsolePrinter.PrintRoll( roll );
-
-            if ( win )
-                ConsolePrinter.PrintWin( winAmount, game.Balance );
-            else
-                ConsolePrinter.PrintLose( bet, game.Balance );
-        }
-
-        private static int GetBet( CasinoGame game )
-        {
-            while ( true )
-            {
-                string inputLine = Console.ReadLine();
-                if ( !int.TryParse( inputLine, out int bet ) )
-                {
-                    ConsolePrinter.PrintInvalidBet( game.Balance );
-                    continue;
-                }
-
-                if ( !game.CanBet( bet ) )
-                {
-                    if ( bet > game.Balance )
-                        ConsolePrinter.PrintBetExceedsBalance( game.Balance );
-                    else
-                        ConsolePrinter.PrintInvalidBet( game.Balance );
-
-                    continue;
-                }
-
-                return bet;
-            }
-        }
-
-        private static Operation? ReadOperation()
-        {
-            string inputLine = Console.ReadLine();
-            if ( !int.TryParse( inputLine, out int choice ) )
-                return null;
+            string? inputLine = Console.ReadLine();
+            if ( !TryParseInt( inputLine, out int choice ) )
+                return Operation.Unknown;
 
             if ( choice < 1 || choice > 3 )
-                return null;
+                return Operation.Unknown;
 
             return ( Operation )choice;
         }
 
+        public static bool TryParseInt( string? inputLine, out int value )
+        {
+            return int.TryParse( inputLine, out value );
+        }
+
+        private static Operation HandlePlayOperation( CasinoGame game )
+        {
+            CasinoGame.HandlePlay( game );
+
+            if ( game.Balance == 0 )
+            {
+                ConsolePrinter.PrintGameOver();
+                return Operation.Exit;
+            }
+            return Operation.Play;
+        }
+
+        private static int ReadInitialBalance()
+        {
+            while ( true )
+            {
+                ConsolePrinter.PrintRequestBalance();
+                string? balanceInput = Console.ReadLine();
+
+                if ( !TryParseInt( balanceInput, out int balance ) || balance <= 0 )
+                {
+                    ConsolePrinter.PrintInvalidBalance();
+                    continue;
+                }
+
+                return balance;
+            }
+        }
     }
 }

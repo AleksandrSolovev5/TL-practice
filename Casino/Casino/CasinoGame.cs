@@ -1,3 +1,5 @@
+using Casino.Utils;
+
 namespace Casino
 {
     public class CasinoGame
@@ -5,6 +7,9 @@ namespace Casino
         private int _balance;
         private readonly Random _rnd = new Random();
         private const int Multiplier = 1;
+        private const int MaxDiceValue = 20;
+        private const int WinThreshold = 18;
+        private const int RollModulo = 17;
 
         public int Balance => _balance;
 
@@ -18,27 +23,76 @@ namespace Casino
             return bet > 0 && bet <= _balance;
         }
 
-        public bool PlayRound( int bet, out int roll, out int winAmount )
-        {
-            roll = RollDice();
-            winAmount = 0;
+        public record RoundResult( int Roll, int WinAmount, bool IsWin );
 
-            if ( roll >= 18 )
+        public RoundResult PlayRound( int bet )
+        {
+            int roll = RollDice();
+            int winAmount = 0;
+            bool isWin = false;
+
+            if ( roll >= WinThreshold )
             {
                 winAmount = CalculateWin( bet, roll );
                 _balance += winAmount;
-                return true;
+                isWin = true;
+            }
+            else
+            {
+                _balance -= bet;
             }
 
-            _balance -= bet;
-            return false;
+            return new RoundResult( roll, winAmount, isWin );
         }
 
-        private int RollDice() => _rnd.Next( 1, 21 );
+        private int RollDice() => _rnd.Next( 1, MaxDiceValue + 1 );
 
         private int CalculateWin( int bet, int roll )
         {
-            return bet * ( 1 + ( Multiplier * ( roll % 17 ) ) );
+            int remainder = roll % RollModulo;
+            int multiplierEffect = Multiplier * remainder;
+            int totalMultiplier = 1 + multiplierEffect;
+            int result = bet * totalMultiplier;
+            return result;
+        }
+        
+        public static void HandlePlay( CasinoGame game )
+        {
+            ConsolePrinter.PrintRequestBet();
+            int bet = GetBet( game );
+
+            RoundResult result = game.PlayRound( bet );
+            ConsolePrinter.PrintRoll( result.Roll );
+
+            if ( result.IsWin )
+                ConsolePrinter.PrintWin( result.WinAmount, game.Balance );
+            else
+                ConsolePrinter.PrintLose( bet, game.Balance );
+        }
+
+        private static int GetBet( CasinoGame game )
+        {
+            while ( true )
+            {
+                string? inputLine = Console.ReadLine();
+                if ( !Program.TryParseInt( inputLine, out int bet ) )
+                {
+                    ConsolePrinter.PrintInvalidBet( game.Balance );
+                    continue;
+                }
+
+                if ( !game.CanBet( bet ) )
+                {
+                    if ( bet > game.Balance )
+                        ConsolePrinter.PrintBetExceedsBalance( game.Balance );
+                    else
+                        ConsolePrinter.PrintInvalidBet( game.Balance );
+
+                    continue;
+                }
+
+                return bet;
+            }
         }
     }
 }

@@ -80,7 +80,7 @@ public class ConsolePrinter
 
     public static void PrintInvalidBet( int balance )
     {
-        Console.WriteLine( "Invalid bet! Enter a positive integer not exceeding your balance:" );
+        Console.WriteLine( $"Invalid bet! Enter a positive integer not exceeding your balance ({balance}):" );
     }
 }
 
