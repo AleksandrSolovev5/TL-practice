@@ -16,6 +16,7 @@ public class Program
                 return;
         }
     }
+
     private static bool HandleMenuChoice( MenuOption choice, int deliveryTimeDays )
     {
         switch ( choice )
@@ -32,6 +33,7 @@ public class Program
                 return true;
         }
     }
+
     private static void MakeOrder( int deliveryTimeDays )
     {
         try
@@ -67,7 +69,6 @@ public class Program
             else
                 ConsoleService.WriteError( ex.Message );
         }
-
     }
 }
 

@@ -7,8 +7,8 @@ namespace OrderManager.Services
         public static void PrintMenu()
         {
             Console.WriteLine( "ORDER MANAGER" );
-            Console.WriteLine( "1 ï¿½ Place a new order" );
-            Console.WriteLine( "2 ï¿½ Exit" );
+            Console.WriteLine( "1 – Place a new order" );
+            Console.WriteLine( "2 – Exit" );
             Console.Write( "Select an option (1 or 2): " );
         }
 
@@ -50,11 +50,17 @@ namespace OrderManager.Services
         }
 
         public static void WriteGoodbye() => Console.WriteLine( "Goodbye!" );
+
         public static void WriteStartOrder() => Console.WriteLine( "Start creating a new order.\n" );
+
         public static void WriteInvalidSelection() => Console.WriteLine( "Invalid selection. Please enter 1 or 2." );
+
         public static void WriteOrderCancelled() => Console.WriteLine( "Order cancelled. Returning to main menu.\n" );
+
         public static void WriteInvalidInt() => Console.WriteLine( "Please enter a positive integer. Please try again.\n" );
+
         public static void WriteError( string message ) => Console.WriteLine( $"Error: {message} Please try again.\n" );
+
         public static void WriteOrderSummary( string name, int quantity, string productName, string address )
         {
             Console.WriteLine( $"\nHello, {name}, you ordered {quantity} {productName} to be delivered to {address}. Is this correct? (yes/no)" );

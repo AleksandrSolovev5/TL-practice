@@ -21,10 +21,7 @@ namespace OrderManager.Services
                 ConsoleService.WriteOrderPlaced( order.CustomerName, order.Quantity, order.ProductName, order.Address, order.DeliveryDate );
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }
