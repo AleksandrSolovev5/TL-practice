@@ -86,4 +86,9 @@ public static class ConsolePrinter
     {
         Console.WriteLine( "\n=== Fighters Information ===" );
     }
+
+    public static void PrintNoFightersError()
+    {
+        Console.WriteLine( "Two fighters are required to start a fight." );
+    }
 }

@@ -9,6 +9,8 @@ namespace Fighters.Models.Fighters
     {
         private readonly IRace _race;
         private readonly IClass _class;
+        private readonly IWeapon _weapon;
+        private readonly IArmor _armor;
         private static readonly Random rand = new Random();
 
         private const int MultiplicatorCriticalDamage = 2;
@@ -17,20 +19,20 @@ namespace Fighters.Models.Fighters
         public string Name { get; private set; }
         public double CurrentHealth { get; private set; }
         public int MaxHealth => _race.Health + _class.Health;
-        public IArmor Armor { get; set; } = new NoArmor();
-        public IWeapon Weapon { get; set; } = new Dagger();
 
-        public Fighter( string name, IRace race, IClass fighterClass )
+        public Fighter( string name, IRace race, IClass fighterClass, IWeapon weapon, IArmor armor )
         {
             Name = name;
             _race = race;
             _class = fighterClass;
+            _weapon = weapon;
+            _armor = armor;
             CurrentHealth = MaxHealth;
         }
 
-        public int CalculateDamage() => Weapon.Damage + _race.Damage + _class.Damage;
+        public int CalculateDamage() => _weapon.Damage + _race.Damage + _class.Damage;
 
-        public int CalculateArmor() => Armor.Armor + _race.Armor;
+        public int CalculateArmor() => _armor.Armor + _race.Armor;
 
         public void TakeDamage( double damage )
         {

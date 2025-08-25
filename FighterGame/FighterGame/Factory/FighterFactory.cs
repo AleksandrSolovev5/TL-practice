@@ -19,11 +19,10 @@ namespace Fighters
             IWeapon weapon = SelectSingleFromList( "weapon", GameData.AvailableWeapons );
             IArmor armor = SelectSingleFromList( "armor", GameData.AvailableArmors );
 
-            IFighter fighter = new Fighter( name, race, fighterClass );
-            fighter.Weapon = weapon;
-            fighter.Armor = armor;
+            IFighter fighter = new Fighter( name, race, fighterClass, weapon, armor );
             return fighter;
         }
+
         private static string GetName()
         {
             while ( true )
@@ -38,6 +37,7 @@ namespace Fighters
                 return name;
             }
         }
+
         private static T SelectSingleFromList<T>( string category, IReadOnlyList<T> options ) where T : IModel
         {
             ConsolePrinter.PrintOptionsList( category, options );
@@ -60,7 +60,6 @@ namespace Fighters
 
                 return options[ choice - 1 ];
             }
-
         }
     }
 }

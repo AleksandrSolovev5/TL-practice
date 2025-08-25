@@ -1,5 +1,5 @@
-﻿using Fighters.Models.Fighters;
-using Fighters.Extensions;
+﻿using Fighters.Extensions;
+using Fighters.Models.Fighters;
 using Fighters.Utils;
 
 namespace Fighters
@@ -8,7 +8,8 @@ namespace Fighters
     {
         private IFighter? Fighter1 { get; set; }
         private IFighter? Fighter2 { get; set; }
-        private Random random = new Random();
+        private readonly Random random = new Random();
+
         private const int MaxRounds = 100;
         private const int ChoicesForStart = 2;
 
@@ -22,19 +23,46 @@ namespace Fighters
         {
             if ( Fighter1 == null || Fighter2 == null )
             {
-                ConsolePrinter.PrintMessage( "Two fighters are required to start a fight." );
+                ConsolePrinter.PrintNoFightersError();
                 return false;
             }
 
-            WriteInfo();
+            WriteFightersInfo();
             int round = 1;
 
-            // случайный выбор, кто первый начнёт
-            bool firstStarts = random.Next( ChoicesForStart ) == 0;
-            IFighter firstFighter = firstStarts ? Fighter1 : Fighter2;
-            IFighter secondFighter = firstStarts ? Fighter2 : Fighter1;
-            ConsolePrinter.PrintFighterStart( firstFighter.Name );
+            (IFighter firstFighter, IFighter secondFighter) = ChooseFirstFighter();
 
+            PlayRounds( firstFighter, secondFighter, round );
+
+            PrintWinner( firstFighter, secondFighter, round );
+            return true;
+        }
+
+        private void PerformAttack( IFighter attacker, IFighter target )
+        {
+            double finalDamage = attacker.Attack( target );
+            ConsolePrinter.PrintAttack( attacker.Name, target.Name, finalDamage, target.CurrentHealth );
+        }
+
+        private void WriteFightersInfo()
+        {
+            ConsolePrinter.PrintFighterInfoHeader();
+            ConsolePrinter.PrintFighterInfo( Fighter1! );
+            ConsolePrinter.PrintFighterInfo( Fighter2! );
+            Console.WriteLine();
+        }
+
+        private (IFighter firstFighter, IFighter secondFighter) ChooseFirstFighter()
+        {
+            bool firstStarts = random.Next( ChoicesForStart ) == 0;
+            IFighter? firstFighter = firstStarts ? Fighter1 : Fighter2;
+            IFighter? secondFighter = firstStarts ? Fighter2 : Fighter1;
+            ConsolePrinter.PrintFighterStart( firstFighter.Name );
+            return (firstFighter, secondFighter);
+        }
+
+        private void PlayRounds( IFighter firstFighter, IFighter secondFighter, int round )
+        {
             while ( firstFighter.IsAlive() && secondFighter.IsAlive() && round <= MaxRounds )
             {
                 ConsolePrinter.PrintRound( round );
@@ -46,35 +74,23 @@ namespace Fighters
 
                 round++;
             }
+        }
 
+        private void PrintWinner( IFighter firstFighter, IFighter secondFighter, int round )
+        {
             if ( round > MaxRounds )
             {
                 ConsolePrinter.PrintDraw();
-                return true;
+                return;
             }
-
-            if ( Fighter1.IsAlive() )
+            if ( firstFighter.IsAlive() )
             {
-                ConsolePrinter.PrintWinner( Fighter1.Name );
+                ConsolePrinter.PrintWinner( firstFighter.Name );
             }
             else
             {
-                ConsolePrinter.PrintWinner( Fighter2.Name );
+                ConsolePrinter.PrintWinner( secondFighter.Name );
             }
-            return true;
-        }
-
-        private void PerformAttack( IFighter attacker, IFighter target )
-        {
-            double finalDamage = attacker.Attack( target );
-            ConsolePrinter.PrintAttack( attacker.Name, target.Name, finalDamage, target.CurrentHealth );
-        }
-        private void WriteInfo()
-        {
-            ConsolePrinter.PrintFighterInfoHeader();
-            ConsolePrinter.PrintFighterInfo( Fighter1! );
-            ConsolePrinter.PrintFighterInfo( Fighter2! );
-            Console.WriteLine();
         }
     }
 }

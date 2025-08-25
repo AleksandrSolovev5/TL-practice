@@ -8,7 +8,7 @@ public static class Program
 {
     private static List<IFighter> Fighters { get; } = [];
     private static GameManager gameManager = new();
-    public static bool isFinished = false;
+    public static bool isFightFinished = false;
 
     public static void Main()
     {
@@ -17,9 +17,8 @@ public static class Program
 
         while ( true )
         {
-            if ( int.TryParse( command, out int commandValue ) && Enum.IsDefined( typeof( MenuCommand ), commandValue ) )
+            if ( IsValidCommand( command, out MenuCommand menuCommand ) )
             {
-                MenuCommand menuCommand = ( MenuCommand )commandValue;
                 switch ( menuCommand )
                 {
                     case MenuCommand.AddFighter:
@@ -64,19 +63,30 @@ public static class Program
         if ( Fighters.Count == 2 )
         {
             gameManager.SetFighters( Fighters[ 0 ], Fighters[ 1 ] );
-            isFinished = gameManager.StartFight();
+            isFightFinished = gameManager.StartFight();
+            return;
         }
-        else
-        {
-            ConsolePrinter.PrintNotEnoughFighters();
-        }
+        ConsolePrinter.PrintNotEnoughFighters();
     }
 
     private static bool HandleStartFight()
     {
         Fight();
-        return isFinished;
+        return isFightFinished;
     }
 
+    private static bool IsValidCommand( string? command, out MenuCommand menuCommand )
+    {
+        menuCommand = default;
+
+        if ( int.TryParse( command, out int commandValue ) &&
+            Enum.IsDefined( typeof( MenuCommand ), commandValue ) )
+        {
+            menuCommand = ( MenuCommand )commandValue;
+            return true;
+        }
+
+        return false;
+    }
 }
 

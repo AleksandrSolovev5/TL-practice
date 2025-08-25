@@ -8,9 +8,6 @@ namespace Fighters.Models.Fighters
         double CurrentHealth { get; }
         int MaxHealth { get; }
 
-        IArmor Armor { get; set; }
-        IWeapon Weapon { get; set; }
-
         int CalculateDamage();
         int CalculateArmor();
         void TakeDamage( double damage );
