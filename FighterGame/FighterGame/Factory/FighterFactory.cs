@@ -27,11 +27,11 @@ namespace Fighters
         {
             while ( true )
             {
-                ConsolePrinter.PrintMessage( "Enter the fighter's name:" );
+                ConsolePrinter.PrintEnterName();
                 string? name = Console.ReadLine();
                 if ( string.IsNullOrWhiteSpace( name ) )
                 {
-                    ConsolePrinter.PrintMessage( "Invalid name. Please try again." );
+                    ConsolePrinter.PrintInvalidName();
                     continue;
                 }
                 return name;
@@ -48,13 +48,13 @@ namespace Fighters
 
                 if ( !int.TryParse( input, out int choice ) )
                 {
-                    ConsolePrinter.PrintMessage( "Invalid input. Please enter a number." );
+                    ConsolePrinter.PrintInvalidNumberInput();
                     continue;
                 }
 
                 if ( choice < 1 || choice > options.Count )
                 {
-                    ConsolePrinter.PrintMessage( "Number out of range. Please try again." );
+                    ConsolePrinter.PrintNumberOutOfRange();
                     continue;
                 }
 

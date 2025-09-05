@@ -5,11 +5,6 @@ namespace Fighters.Utils;
 
 public static class ConsolePrinter
 {
-    public static void PrintMessage( string message )
-    {
-        Console.WriteLine( message );
-    }
-
     public static void PrintMenu()
     {
         Console.WriteLine( "==== Menu ====" );
@@ -89,6 +84,38 @@ public static class ConsolePrinter
 
     public static void PrintNoFightersError()
     {
-        Console.WriteLine( "Two fighters are required to start a fight." );
+        Console.WriteLine( "At least two fighters are required to start a fight." );
+    }
+
+    public static void PrintFighterDeath( string fighterName )
+    {
+        Console.WriteLine( "\n=======================" );
+        Console.WriteLine( $"{fighterName} has been defeated!" );
+        Console.WriteLine( "=======================" );
+    }
+
+    public static void PrintMaxFightersReached( int maxFighters )
+    {
+        Console.WriteLine( $"Cannot add more than {maxFighters} fighters.\n" );
+    }
+
+    public static void PrintEnterName()
+    {
+        Console.WriteLine( "Enter the fighter's name:" );
+    }
+
+    public static void PrintInvalidName()
+    {
+        Console.WriteLine( "Invalid name. Please try again." );
+    }
+
+    public static void PrintInvalidNumberInput()
+    {
+        Console.WriteLine( "Invalid input. Please enter a number." );
+    }
+
+    public static void PrintNumberOutOfRange()
+    {
+        Console.WriteLine( "Number out of range. Please try again." );
     }
 }

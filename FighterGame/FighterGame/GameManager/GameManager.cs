@@ -1,27 +1,38 @@
 ﻿using Fighters.Extensions;
 using Fighters.Models.Fighters;
 using Fighters.Utils;
+using Fighters.Config;
 
 namespace Fighters
 {
     public class GameManager
     {
-        private IFighter? Fighter1 { get; set; }
-        private IFighter? Fighter2 { get; set; }
-        private readonly Random random = new Random();
+        private readonly List<IFighter> fighters = [];
 
-        private const int MaxRounds = 100;
-        private const int ChoicesForStart = 2;
-
-        public void SetFighters( IFighter fighter1, IFighter fighter2 )
+        public bool IsMaxFightersReached()
         {
-            Fighter1 = fighter1;
-            Fighter2 = fighter2;
+            if ( fighters.Count >= GameConfig.MaxFighters )
+            {
+                ConsolePrinter.PrintMaxFightersReached( GameConfig.MaxFighters );
+                return true;
+            }
+            return false;
+        }
+        public bool AddFighter( IFighter fighter )
+        {
+            if ( fighters.Count >= GameConfig.MaxFighters )
+            {
+                ConsolePrinter.PrintMaxFightersReached( GameConfig.MaxFighters );
+                return false;
+            }
+
+            fighters.Add( fighter );
+            return true;
         }
 
         public bool StartFight()
         {
-            if ( Fighter1 == null || Fighter2 == null )
+            if ( fighters.Count < GameConfig.MinFighters )
             {
                 ConsolePrinter.PrintNoFightersError();
                 return false;
@@ -30,67 +41,72 @@ namespace Fighters
             WriteFightersInfo();
             int round = 1;
 
-            (IFighter firstFighter, IFighter secondFighter) = ChooseFirstFighter();
+            while ( fighters.Count( f => f.IsAlive() ) > 1 && round <= GameConfig.MaxRounds )
+            {
+                ConsolePrinter.PrintRound( round );
 
-            PlayRounds( firstFighter, secondFighter, round );
+                for ( int i = 0; i < fighters.Count; i++ )
+                {
+                    IFighter attacker = fighters[ i ];
+                    if ( !attacker.IsAlive() )
+                    {
+                        continue;
+                    }
 
-            PrintWinner( firstFighter, secondFighter, round );
+                    IFighter? target = GetNextAliveFighter( i );
+                    if ( target != null )
+                        PerformAttack( attacker, target );
+                }
+
+                round++;
+            }
+
+            PrintWinner( round );
             return true;
+        }
+
+        private IFighter? GetNextAliveFighter( int currentIndex )
+        {
+            int nextIndex = ( currentIndex + 1 ) % fighters.Count;
+            while ( nextIndex != currentIndex )
+            {
+                if ( fighters[ nextIndex ].IsAlive() )
+                    return fighters[ nextIndex ];
+
+                nextIndex = ( nextIndex + 1 ) % fighters.Count;
+            }
+            return null;
         }
 
         private void PerformAttack( IFighter attacker, IFighter target )
         {
             double finalDamage = attacker.Attack( target );
             ConsolePrinter.PrintAttack( attacker.Name, target.Name, finalDamage, target.CurrentHealth );
+
+            if ( !target.IsAlive() )
+                ConsolePrinter.PrintFighterDeath( target.Name );
         }
 
         private void WriteFightersInfo()
         {
             ConsolePrinter.PrintFighterInfoHeader();
-            ConsolePrinter.PrintFighterInfo( Fighter1! );
-            ConsolePrinter.PrintFighterInfo( Fighter2! );
+            foreach ( IFighter fighter in fighters )
+                ConsolePrinter.PrintFighterInfo( fighter );
+
             Console.WriteLine();
         }
 
-        private (IFighter firstFighter, IFighter secondFighter) ChooseFirstFighter()
+        private void PrintWinner( int round )
         {
-            bool firstStarts = random.Next( ChoicesForStart ) == 0;
-            IFighter? firstFighter = firstStarts ? Fighter1 : Fighter2;
-            IFighter? secondFighter = firstStarts ? Fighter2 : Fighter1;
-            ConsolePrinter.PrintFighterStart( firstFighter.Name );
-            return (firstFighter, secondFighter);
-        }
-
-        private void PlayRounds( IFighter firstFighter, IFighter secondFighter, int round )
-        {
-            while ( firstFighter.IsAlive() && secondFighter.IsAlive() && round <= MaxRounds )
-            {
-                ConsolePrinter.PrintRound( round );
-
-                PerformAttack( firstFighter, secondFighter );
-                if ( !secondFighter.IsAlive() ) break;
-
-                PerformAttack( secondFighter, firstFighter );
-
-                round++;
-            }
-        }
-
-        private void PrintWinner( IFighter firstFighter, IFighter secondFighter, int round )
-        {
-            if ( round > MaxRounds )
+            if ( round > GameConfig.MaxRounds )
             {
                 ConsolePrinter.PrintDraw();
                 return;
             }
-            if ( firstFighter.IsAlive() )
-            {
-                ConsolePrinter.PrintWinner( firstFighter.Name );
-            }
-            else
-            {
-                ConsolePrinter.PrintWinner( secondFighter.Name );
-            }
+
+            IFighter? winner = fighters.FirstOrDefault( f => f.IsAlive() );
+            if ( winner != null )
+                ConsolePrinter.PrintWinner( winner.Name );
         }
     }
 }

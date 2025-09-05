@@ -6,9 +6,8 @@ namespace Fighters;
 
 public static class Program
 {
-    private static List<IFighter> Fighters { get; } = [];
-    private static GameManager gameManager = new();
-    public static bool isFightFinished = false;
+    private static readonly GameManager gameManager = new();
+    private static bool isFightFinished = false;
 
     public static void Main()
     {
@@ -17,15 +16,18 @@ public static class Program
 
         while ( true )
         {
-            if ( IsValidCommand( command, out MenuCommand menuCommand ) )
+            MenuCommand? parsedCommand = ParseCommand( command );
+
+            if ( parsedCommand is MenuCommand menuCommand )
             {
                 switch ( menuCommand )
                 {
                     case MenuCommand.AddFighter:
-                        AddFighter();
+                        HandleAddFighter();
                         break;
                     case MenuCommand.StartFight:
-                        if ( HandleStartFight() )
+                        HandleStartFight();
+                        if ( isFightFinished )
                             return;
                         break;
                     case MenuCommand.Exit:
@@ -46,47 +48,33 @@ public static class Program
         }
     }
 
-    private static void AddFighter()
+    private static void HandleAddFighter()
     {
-        if ( Fighters.Count >= 2 )
+        if ( gameManager.IsMaxFightersReached() )
         {
-            ConsolePrinter.PrintFighterLimit();
             return;
         }
         IFighter fighter = FighterFactory.CreateFighter();
-        Fighters.Add( fighter );
-        ConsolePrinter.PrintFighterAdded();
-    }
 
-    private static void Fight()
-    {
-        if ( Fighters.Count == 2 )
+        if ( gameManager.AddFighter( fighter ) )
         {
-            gameManager.SetFighters( Fighters[ 0 ], Fighters[ 1 ] );
-            isFightFinished = gameManager.StartFight();
-            return;
+            ConsolePrinter.PrintFighterAdded();
         }
-        ConsolePrinter.PrintNotEnoughFighters();
     }
 
-    private static bool HandleStartFight()
+    private static void HandleStartFight()
     {
-        Fight();
-        return isFightFinished;
+        isFightFinished = gameManager.StartFight();
     }
 
-    private static bool IsValidCommand( string? command, out MenuCommand menuCommand )
+    private static MenuCommand? ParseCommand( string? command )
     {
-        menuCommand = default;
-
         if ( int.TryParse( command, out int commandValue ) &&
             Enum.IsDefined( typeof( MenuCommand ), commandValue ) )
         {
-            menuCommand = ( MenuCommand )commandValue;
-            return true;
+            return ( MenuCommand )commandValue;
         }
 
-        return false;
+        return null;
     }
 }
-

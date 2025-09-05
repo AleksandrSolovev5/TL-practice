@@ -1,4 +1,5 @@
-﻿using Fighters.Models.Armors;
+﻿using Fighters.Config;
+using Fighters.Models.Armors;
 using Fighters.Models.Classes;
 using Fighters.Models.Races;
 using Fighters.Models.Weapons;
@@ -11,10 +12,9 @@ namespace Fighters.Models.Fighters
         private readonly IClass _class;
         private readonly IWeapon _weapon;
         private readonly IArmor _armor;
-        private static readonly Random rand = new Random();
+        private static readonly Random rand = new();
 
-        private const int MultiplicatorCriticalDamage = 2;
-        private const double CriticalHitChance = 0.1;
+
 
         public string Name { get; private set; }
         public double CurrentHealth { get; private set; }
@@ -49,8 +49,8 @@ namespace Fighters.Models.Fighters
             double randomMultiplier = 0.9 + rand.NextDouble() * 0.2; // урон +- 10%
             double damage = baseDamage * randomMultiplier;
 
-            if ( rand.NextDouble() < CriticalHitChance )
-                damage *= MultiplicatorCriticalDamage;
+            if ( rand.NextDouble() < GameConfig.CriticalHitChance )
+                damage *= GameConfig.MultiplicatorCriticalDamage;
 
             return damage;
         }
