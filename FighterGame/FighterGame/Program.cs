@@ -54,17 +54,19 @@ public static class Program
         {
             return;
         }
-        IFighter fighter = FighterFactory.CreateFighter();
 
-        if ( gameManager.AddFighter( fighter ) )
-        {
-            ConsolePrinter.PrintFighterAdded();
-        }
+        IFighter fighter = FighterFactory.CreateFighter();
+        gameManager.AddFighter( fighter );
     }
+
 
     private static void HandleStartFight()
     {
-        isFightFinished = gameManager.StartFight();
+        if ( gameManager.CanStartFight() )
+        {
+            gameManager.StartFight();
+            isFightFinished = true;
+        }
     }
 
     private static MenuCommand? ParseCommand( string? command )

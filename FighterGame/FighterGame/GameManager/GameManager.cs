@@ -1,5 +1,4 @@
-﻿using Fighters.Extensions;
-using Fighters.Models.Fighters;
+﻿using Fighters.Models.Fighters;
 using Fighters.Utils;
 using Fighters.Config;
 
@@ -8,6 +7,16 @@ namespace Fighters
     public class GameManager
     {
         private readonly List<IFighter> fighters = [];
+
+        public bool CanStartFight()
+        {
+            if ( fighters.Count < GameConfig.MinFighters )
+            {
+                ConsolePrinter.PrintNoFightersError();
+                return false;
+            }
+            return true;
+        }
 
         public bool IsMaxFightersReached()
         {
@@ -18,37 +27,33 @@ namespace Fighters
             }
             return false;
         }
-        public bool AddFighter( IFighter fighter )
+
+        public void AddFighter( IFighter fighter )
         {
             if ( fighters.Count >= GameConfig.MaxFighters )
             {
                 ConsolePrinter.PrintMaxFightersReached( GameConfig.MaxFighters );
-                return false;
+                return;
             }
 
             fighters.Add( fighter );
-            return true;
+            ConsolePrinter.PrintFighterAdded();
         }
 
-        public bool StartFight()
-        {
-            if ( fighters.Count < GameConfig.MinFighters )
-            {
-                ConsolePrinter.PrintNoFightersError();
-                return false;
-            }
 
+        public void StartFight()
+        {
             WriteFightersInfo();
             int round = 1;
 
-            while ( fighters.Count( f => f.IsAlive() ) > 1 && round <= GameConfig.MaxRounds )
+            while ( fighters.Count( f => f.IsAlive ) > 1 && round <= GameConfig.MaxRounds )
             {
                 ConsolePrinter.PrintRound( round );
 
                 for ( int i = 0; i < fighters.Count; i++ )
                 {
                     IFighter attacker = fighters[ i ];
-                    if ( !attacker.IsAlive() )
+                    if ( !attacker.IsAlive )
                     {
                         continue;
                     }
@@ -62,7 +67,6 @@ namespace Fighters
             }
 
             PrintWinner( round );
-            return true;
         }
 
         private IFighter? GetNextAliveFighter( int currentIndex )
@@ -70,7 +74,7 @@ namespace Fighters
             int nextIndex = ( currentIndex + 1 ) % fighters.Count;
             while ( nextIndex != currentIndex )
             {
-                if ( fighters[ nextIndex ].IsAlive() )
+                if ( fighters[ nextIndex ].IsAlive )
                     return fighters[ nextIndex ];
 
                 nextIndex = ( nextIndex + 1 ) % fighters.Count;
@@ -83,7 +87,7 @@ namespace Fighters
             double finalDamage = attacker.Attack( target );
             ConsolePrinter.PrintAttack( attacker.Name, target.Name, finalDamage, target.CurrentHealth );
 
-            if ( !target.IsAlive() )
+            if ( !target.IsAlive )
                 ConsolePrinter.PrintFighterDeath( target.Name );
         }
 
@@ -104,7 +108,7 @@ namespace Fighters
                 return;
             }
 
-            IFighter? winner = fighters.FirstOrDefault( f => f.IsAlive() );
+            IFighter? winner = fighters.FirstOrDefault( f => f.IsAlive );
             if ( winner != null )
                 ConsolePrinter.PrintWinner( winner.Name );
         }

@@ -7,7 +7,7 @@ namespace Fighters.Models.Fighters
     {
         double CurrentHealth { get; }
         int MaxHealth { get; }
-
+        bool IsAlive { get; }
         int CalculateDamage();
         int CalculateArmor();
         void TakeDamage( double damage );

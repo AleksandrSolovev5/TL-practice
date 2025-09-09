@@ -14,8 +14,6 @@ namespace Fighters.Models.Fighters
         private readonly IArmor _armor;
         private static readonly Random rand = new();
 
-
-
         public string Name { get; private set; }
         public double CurrentHealth { get; private set; }
         public int MaxHealth => _race.Health + _class.Health;
@@ -63,5 +61,7 @@ namespace Fighters.Models.Fighters
             target.TakeDamage( finalDamage );
             return finalDamage;
         }
+
+        public bool IsAlive => CurrentHealth > 0;
     }
 }
