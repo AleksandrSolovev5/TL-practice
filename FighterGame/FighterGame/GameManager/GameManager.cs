@@ -30,16 +30,14 @@ namespace Fighters
 
         public void AddFighter( IFighter fighter )
         {
-            if ( fighters.Count >= GameConfig.MaxFighters )
+            if ( IsMaxFightersReached() )
             {
-                ConsolePrinter.PrintMaxFightersReached( GameConfig.MaxFighters );
                 return;
             }
 
             fighters.Add( fighter );
             ConsolePrinter.PrintFighterAdded();
         }
-
 
         public void StartFight()
         {
